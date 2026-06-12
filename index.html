@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EliteDrive | Premium Araç Kiralama</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --gold-light: #F4E4BC;
+            --gold-dark: #B8960C;
+            --dark: #0a0a0a;
+            --darker: #050505;
+            --gray: #1a1a1a;
+            --light-gray: #2a2a2a;
+            --white: #ffffff;
+            --off-white: #f5f5f5;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; overflow-x: hidden; }
+        body { font-family: 'Inter', sans-serif; background: var(--darker); color: var(--white); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+
+        /* Preloader */
+        .preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--darker); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .preloader-logo { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 6vw, 3rem); font-weight: 900; color: var(--gold); letter-spacing: 8px; opacity: 0; transform: translateY(30px); }
+        .preloader-bar { width: 200px; height: 2px; background: var(--gray); margin-top: 30px; position: relative; overflow: hidden; border-radius: 2px; }
+        .preloader-progress { position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold)); background-size: 200% 100%; animation: shimmer 1.5s infinite; transition: width 0.3s ease; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+        /* Navigation */
+        nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: transparent; }
+        nav.scrolled { background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); padding: 12px 50px; border-bottom: 1px solid rgba(212, 175, 55, 0.15); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); }
+        .logo { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 4vw, 2rem); font-weight: 700; color: var(--gold); text-decoration: none; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; }
+        .logo i { font-size: 1.3rem; animation: crownFloat 3s ease-in-out infinite; }
+        @keyframes crownFloat { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-3px) rotate(3deg); } }
+        .nav-links { display: flex; gap: 35px; list-style: none; }
+        .nav-links a { color: var(--white); text-decoration: none; font-size: 0.85rem; font-weight: 500; letter-spacing: 1.5px; text-transform: uppercase; position: relative; transition: color 0.3s ease; padding: 5px 0; }
+        .nav-links a::after { content: ''; position: absolute; bottom: -2px; left: 50%; width: 0; height: 2px; background: var(--gold); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(-50%); }
+        .nav-links a:hover { color: var(--gold); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-cta { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--dark); padding: 12px 28px; border-radius: 30px; text-decoration: none; font-weight: 600; font-size: 0.8rem; letter-spacing: 1px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid var(--gold); display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
+        .nav-cta:hover { background: transparent; color: var(--gold); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4); }
+
+        /* Mobile Menu */
+        .mobile-menu-btn { display: none; background: none; border: none; color: var(--gold); font-size: 1.5rem; cursor: pointer; padding: 8px; z-index: 1001; }
+        .mobile-menu { position: fixed; top: 0; right: -100%; width: 80%; max-width: 350px; height: 100vh; background: rgba(5, 5, 5, 0.98); backdrop-filter: blur(30px); z-index: 999; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 100px 40px 40px; border-left: 1px solid rgba(212, 175, 55, 0.2); }
+        .mobile-menu.active { right: 0; }
+        .mobile-menu ul { list-style: none; }
+        .mobile-menu ul li { margin-bottom: 25px; opacity: 0; transform: translateX(30px); transition: all 0.3s ease; }
+        .mobile-menu.active ul li { opacity: 1; transform: translateX(0); }
+        .mobile-menu ul li:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-menu ul li:nth-child(2) { transition-delay: 0.15s; }
+        .mobile-menu ul li:nth-child(3) { transition-delay: 0.2s; }
+        .mobile-menu ul li:nth-child(4) { transition-delay: 0.25s; }
+        .mobile-menu ul li:nth-child(5) { transition-delay: 0.3s; }
+        .mobile-menu ul li a { color: var(--white); text-decoration: none; font-size: 1.2rem; font-weight: 500; display: flex; align-items: center; gap: 15px; transition: color 0.3s ease; }
+        .mobile-menu ul li a i { color: var(--gold); width: 24px; }
+        .mobile-menu ul li a:hover { color: var(--gold); }
+        .mobile-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 998; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .mobile-overlay.active { opacity: 1; visibility: visible; }
+
+        /* Hero Section */
+        .hero { min-height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 120px 20px 80px; }
+        .hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 120%; background: radial-gradient(ellipse at 20% 50%, rgba(212, 175, 55, 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(212, 175, 55, 0.05) 0%, transparent 50%), linear-gradient(135deg, rgba(5,5,5,0.9) 0%, rgba(5,5,5,0.6) 50%, rgba(5,5,5,0.9) 100%), url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1920&q=80') center/cover; z-index: -1; will-change: transform; }
+        .hero-content { text-align: center; z-index: 2; max-width: 900px; padding: 0 20px; position: relative; }
+        .hero-badge { display: inline-block; border: 1px solid var(--gold); color: var(--gold); padding: 10px 30px; border-radius: 30px; font-size: 0.8rem; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 30px; opacity: 0; transform: translateY(20px); background: rgba(212, 175, 55, 0.05); backdrop-filter: blur(10px); }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 8vw, 5.5rem); font-weight: 900; line-height: 1.1; margin-bottom: 20px; opacity: 0; transform: translateY(40px); }
+        .hero h1 span { color: var(--gold); display: block; position: relative; }
+        .hero h1 span::after { content: ''; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 80px; height: 3px; background: var(--gold); border-radius: 2px; }
+        .hero-subtitle { font-size: clamp(1rem, 2.5vw, 1.2rem); color: rgba(255,255,255,0.7); margin-bottom: 40px; font-weight: 300; letter-spacing: 1px; opacity: 0; transform: translateY(30px); max-width: 600px; margin-left: auto; margin-right: auto; }
+        .hero-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; opacity: 0; transform: translateY(30px); }
+        .btn-primary { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--dark); padding: 16px 40px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.95rem; letter-spacing: 1px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid var(--gold); display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3); position: relative; overflow: hidden; }
+        .btn-primary::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition: left 0.5s ease; }
+        .btn-primary:hover::before { left: 100%; }
+        .btn-primary:hover { background: transparent; color: var(--gold); transform: translateY(-3px); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4); }
+        .btn-secondary { background: transparent; color: var(--white); padding: 16px 40px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 0.95rem; letter-spacing: 1px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255,255,255,0.3); display: inline-flex; align-items: center; gap: 10px; position: relative; overflow: hidden; }
+        .btn-secondary:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); }
+        .hero-stats { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 50px; text-align: center; opacity: 0; flex-wrap: wrap; justify-content: center; padding: 0 20px; }
+        .stat-item { position: relative; }
+        .stat-item::after { content: ''; position: absolute; right: -25px; top: 50%; transform: translateY(-50%); width: 1px; height: 40px; background: rgba(212, 175, 55, 0.3); }
+        .stat-item:last-child::after { display: none; }
+        .stat-item h3 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 4vw, 2.5rem); color: var(--gold); font-weight: 700; }
+        .stat-item p { font-size: 0.8rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 2px; margin-top: 5px; }
+
+        /* Floating Particles */
+        .particles { position: absolute; width: 100%; height: 100%; overflow: hidden; z-index: 1; pointer-events: none; }
+        .particle { position: absolute; width: 4px; height: 4px; background: var(--gold); border-radius: 50%; opacity: 0; animation: floatParticle 15s infinite; }
+        @keyframes floatParticle { 0% { transform: translateY(100vh) translateX(0); opacity: 0; } 10% { opacity: 0.4; } 90% { opacity: 0.4; } 100% { transform: translateY(-100vh) translateX(100px); opacity: 0; } }
+
+        /* Scroll Indicator */
+        .scroll-indicator { position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; opacity: 0; animation: fadeInUp 1s ease 2s forwards; }
+        .scroll-indicator span { font-size: 0.7rem; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+        .scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--gold), transparent); animation: scrollBounce 2s infinite; }
+        @keyframes scrollBounce { 0%, 100% { transform: translateY(0); opacity: 1; } 50% { transform: translateY(10px); opacity: 0.5; } }
+        @keyframes fadeInUp { to { opacity: 1; } }
+
+        /* Section Styles */
+        section { padding: 100px 50px; position: relative; }
+        .section-header { text-align: center; margin-bottom: 80px; }
+        .section-header h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; margin-bottom: 15px; position: relative; display: inline-block; }
+        .section-header h2::after { content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%); width: 60px; height: 3px; background: var(--gold); border-radius: 2px; }
+        .section-header p { color: rgba(255,255,255,0.6); font-size: 1.1rem; max-width: 600px; margin: 25px auto 0; }
+        .gold-line { width: 60px; height: 3px; background: var(--gold); margin: 20px auto; border-radius: 2px; position: relative; }
+        .gold-line::before, .gold-line::after { content: ''; position: absolute; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; background: var(--gold); border-radius: 50%; }
+        .gold-line::before { left: -15px; }
+        .gold-line::after { right: -15px; }
+
+        /* Fleet Section */
+        .fleet { background: var(--dark); position: relative; }
+        .fleet::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent); }
+        .fleet-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; max-width: 1400px; margin: 0 auto; }
+        .car-card { background: var(--gray); border-radius: 24px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.08); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; cursor: pointer; transform-style: preserve-3d; perspective: 1000px; }
+        .car-card:hover { transform: translateY(-12px) rotateX(2deg); border-color: rgba(212, 175, 55, 0.3); box-shadow: 0 30px 60px rgba(0,0,0,0.5), 0 0 40px rgba(212, 175, 55, 0.1); }
+        .car-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, transparent 60%, rgba(212, 175, 55, 0.03) 100%); z-index: 1; pointer-events: none; opacity: 0; transition: opacity 0.4s ease; }
+        .car-card:hover::before { opacity: 1; }
+        .car-image { height: 220px; overflow: hidden; position: relative; }
+        .car-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .car-card:hover .car-image img { transform: scale(1.15); }
+        .car-badge { position: absolute; top: 15px; right: 15px; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--dark); padding: 6px 16px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; z-index: 2; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .car-info { padding: 25px; position: relative; z-index: 2; }
+        .car-brand { color: var(--gold); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; font-weight: 600; margin-bottom: 5px; }
+        .car-name { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; margin-bottom: 12px; line-height: 1.3; }
+        .car-specs { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .car-spec { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 8px; }
+        .car-spec i { color: var(--gold); font-size: 0.75rem; }
+        .car-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); }
+        .car-price { font-size: 1.4rem; font-weight: 700; color: var(--gold); font-family: 'Playfair Display', serif; }
+        .car-price span { font-size: 0.8rem; color: rgba(255,255,255,0.5); font-weight: 400; font-family: 'Inter', sans-serif; }
+        .car-btn { background: transparent; border: 1.5px solid var(--gold); color: var(--gold); padding: 10px 24px; border-radius: 25px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); display: inline-flex; align-items: center; gap: 8px; }
+        .car-btn:hover { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--dark); transform: translateX(3px); box-shadow: 0 5px 20px rgba(212, 175, 55, 0.3); }
+        .car-btn i { transition: transform 0.3s ease; }
+        .car-btn:hover i { transform: translateX(3px); }
+
+        /* Features Section */
+        .features { background: linear-gradient(180deg, var(--darker) 0%, var(--gray) 100%); position: relative; overflow: hidden; }
+        .features::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(212, 175, 55, 0.02) 0%, transparent 70%); animation: rotateGradient 30s linear infinite; }
+        @keyframes rotateGradient { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+        .feature-card { text-align: center; padding: 45px 30px; background: rgba(26, 26, 26, 0.6); backdrop-filter: blur(10px); border-radius: 24px; border: 1px solid rgba(212, 175, 55, 0.08); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .feature-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, var(--gold), transparent); transform: scaleX(0); transition: transform 0.5s ease; }
+        .feature-card::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(212, 175, 55, 0.05) 0%, transparent 70%); opacity: 0; transition: opacity 0.4s ease; }
+        .feature-card:hover { transform: translateY(-8px); border-color: rgba(212, 175, 55, 0.25); box-shadow: 0 25px 50px rgba(0,0,0,0.4), 0 0 30px rgba(212, 175, 55, 0.1); }
+        .feature-card:hover::before { transform: scaleX(1); }
+        .feature-card:hover::after { opacity: 1; }
+        .feature-icon { width: 80px; height: 80px; background: rgba(212, 175, 55, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; font-size: 2rem; color: var(--gold); transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: relative; z-index: 1; }
+        .feature-card:hover .feature-icon { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--dark); transform: rotateY(360deg) scale(1.1); box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3); }
+        .feature-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 15px; position: relative; z-index: 1; }
+        .feature-card p { color: rgba(255,255,255,0.6); font-size: 0.9rem; line-height: 1.7; position: relative; z-index: 1; }
+
+        /* Testimonials Section */
+        .testimonials { background: var(--dark); overflow: hidden; position: relative; }
+        .testimonials::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent); }
+        .testimonials-container { max-width: 1200px; margin: 0 auto; position: relative; }
+        .testimonials-slider { display: flex; gap: 25px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 20px 10px; scrollbar-width: none; -ms-overflow-style: none; cursor: grab; }
+        .testimonials-slider::-webkit-scrollbar { display: none; }
+        .testimonials-slider:active { cursor: grabbing; }
+        .testimonial-card { min-width: 350px; max-width: 350px; background: var(--gray); border-radius: 24px; padding: 40px; border: 1px solid rgba(212, 175, 55, 0.08); scroll-snap-align: start; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .testimonial-card::before { content: '"'; position: absolute; top: 20px; right: 30px; font-family: 'Playfair Display', serif; font-size: 6rem; color: rgba(212, 175, 55, 0.1); line-height: 1; }
+        .testimonial-card:hover { border-color: rgba(212, 175, 55, 0.25); transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .testimonial-stars { color: var(--gold); margin-bottom: 20px; font-size: 0.9rem; letter-spacing: 2px; }
+        .testimonial-text { font-size: 1rem; line-height: 1.8; color: rgba(255,255,255,0.85); margin-bottom: 25px; font-style: italic; }
+        .testimonial-author { display: flex; align-items: center; gap: 15px; }
+        .author-avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-dark)); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--dark); font-size: 1.1rem; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); }
+        .author-info h4 { font-weight: 600; margin-bottom: 3px; font-size: 0.95rem; }
+        .author-info p { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+        .testimonial-car { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.8rem; color: var(--gold); font-weight: 500; }
+        .testimonial-car i { margin-right: 5px; }
+
+        /* Process Section */
+        .process { background: var(--darker); position: relative; overflow: hidden; }
+        .process::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(212, 175, 55, 0.03) 0%, transparent 70%); border-radius: 50%; }
+        .process-steps { display: flex; justify-content: space-between; max-width: 1000px; margin: 0 auto; position: relative; flex-wrap: wrap; gap: 40px; }
+        .process-steps::before { content: ''; position: absolute; top: 40px; left: 10%; width: 80%; height: 2px; background: linear-gradient(90deg, var(--gold) 0%, var(--gold-dark) 50%, transparent 100%); z-index: 0; opacity: 0.5; }
+        .step { flex: 1; min-width: 200px; text-align: center; position: relative; z-index: 1; }
+        .step-number { width: 80px; height: 80px; background: var(--gray); border: 2px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: var(--gold); position: relative; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 20px rgba(212, 175, 55, 0.1); }
+        .step-number::after { content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 1px solid rgba(212, 175, 55, 0.2); animation: pulseRing 2s infinite; }
+        @keyframes pulseRing { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.3); opacity: 0; } }
+        .step:hover .step-number { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); color: var(--dark); transform: scale(1.1); box-shadow: 0 0 30px rgba(212, 175, 55, 0.4); }
+        .step h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin-bottom: 10px; }
+        .step p { color: rgba(255,255,255,0.6); font-size: 0.85rem; line-height: 1.7; }
+
+        /* CTA Section */
+        .cta-section { background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(5, 5, 5, 0.95) 100%), url('https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=1920&q=80') center/cover fixed; text-align: center; padding: 150px 20px; position: relative; overflow: hidden; }
+        .cta-section::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23d4af37' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); opacity: 0.5; }
+        .cta-section h2 { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 20px; position: relative; z-index: 1; }
+        .cta-section p { font-size: 1.1rem; color: rgba(255,255,255,0.7); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; position: relative; z-index: 1; }
+
+        /* Footer */
+        footer { background: var(--darker); border-top: 1px solid rgba(212, 175, 55, 0.1); padding: 80px 50px 30px; position: relative; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 60px; max-width: 1200px; margin: 0 auto; }
+        .footer-brand .logo { margin-bottom: 20px; display: inline-flex; }
+        .footer-brand p { color: rgba(255,255,255,0.6); line-height: 1.8; margin-bottom: 25px; font-size: 0.9rem; }
+        .social-links { display: flex; gap: 12px; }
+        .social-links a { width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; color: var(--white); text-decoration: none; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); font-size: 0.95rem; }
+        .social-links a:hover { background: linear-gradient(135deg, var(--gold), var(--gold-dark)); border-color: var(--gold); color: var(--dark); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(212, 175, 55, 0.3); }
+        .footer-column h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 25px; color: var(--gold); position: relative; display: inline-block; }
+        .footer-column h4::after { content: ''; position: absolute; bottom: -8px; left: 0; width: 30px; height: 2px; background: var(--gold); }
+        .footer-column ul { list-style: none; }
+        .footer-column ul li { margin-bottom: 12px; }
+        .footer-column ul li a { color: rgba(255,255,255,0.6); text-decoration: none; font-size: 0.85rem; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px; }
+        .footer-column ul li a:hover { color: var(--gold); padding-left: 5px; }
+        .footer-column ul li a i { font-size: 0.7rem; color: var(--gold); transition: transform 0.3s ease; }
+        .footer-column ul li a:hover i { transform: translateX(3px); }
+        .footer-bottom { max-width: 1200px; margin: 60px auto 0; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+        .footer-bottom p { color: rgba(255,255,255,0.4); font-size: 0.8rem; }
+        .footer-bottom a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.3s ease; }
+        .footer-bottom a:hover { color: var(--gold); }
+
+        /* WhatsApp Button */
+        .whatsapp-float { position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; background: linear-gradient(135deg, #25D366, #128C7E); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.8rem; text-decoration: none; box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4); z-index: 999; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); animation: pulseWhatsApp 2s infinite; }
+        .whatsapp-float:hover { transform: scale(1.1) rotate(10deg); box-shadow: 0 15px 40px rgba(37, 211, 102, 0.6); }
+        @keyframes pulseWhatsApp { 0%, 100% { box-shadow: 0 10px 30px rgba(37, 211, 102, 0.4); } 50% { box-shadow: 0 10px 40px rgba(37, 211, 102, 0.7); } }
+        .whatsapp-tooltip { position: absolute; right: 75px; background: white; color: var(--dark); padding: 8px 15px; border-radius: 10px; font-size: 0.8rem; font-weight: 600; white-space: nowrap; opacity: 0; transform: translateX(10px); transition: all 0.3s ease; pointer-events: none; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .whatsapp-float:hover .whatsapp-tooltip { opacity: 1; transform: translateX(0); }
+
+        /* Scroll Reveal */
+        .reveal { opacity: 0; transform: translateY(50px); transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--darker); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-light); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+        }
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            nav.scrolled { padding: 12px 20px; }
+            .nav-links, .nav-cta { display: none; }
+            .mobile-menu-btn { display: block; }
+            section { padding: 60px 20px; }
+            .hero { padding: 100px 15px 60px; min-height: auto; padding-bottom: 120px; }
+            .hero-stats { position: relative; bottom: auto; left: auto; transform: none; margin-top: 40px; gap: 25px; }
+            .stat-item::after { display: none; }
+            .stat-item h3 { font-size: 1.8rem; }
+            .scroll-indicator { display: none; }
+            .fleet-grid { grid-template-columns: 1fr; gap: 20px; }
+            .car-card { max-width: 100%; }
+            .car-image { height: 200px; }
+            .features-grid { grid-template-columns: 1fr; gap: 20px; }
+            .feature-card { padding: 35px 25px; }
+            .process-steps::before { display: none; }
+            .process-steps { flex-direction: column; gap: 40px; }
+            .step { min-width: 100%; }
+            .testimonial-card { min-width: 300px; max-width: 300px; padding: 30px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 40px; }
+            .footer-bottom { flex-direction: column; text-align: center; gap: 15px; }
+            .whatsapp-float { width: 55px; height: 55px; font-size: 1.6rem; bottom: 20px; right: 20px; }
+            .whatsapp-tooltip { display: none; }
+            .cta-section { padding: 80px 20px; }
+            .btn-primary, .btn-secondary { padding: 14px 30px; font-size: 0.9rem; width: 100%; justify-content: center; }
+            .hero-buttons { width: 100%; }
+            .hero-buttons a { width: 100%; }
+        }
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 2.2rem; }
+            .section-header h2 { font-size: 1.8rem; }
+            .car-name { font-size: 1.2rem; }
+            .car-price { font-size: 1.2rem; }
+            .stat-item h3 { font-size: 1.5rem; }
+        }
+        @media (hover: none) {
+            .car-card:hover { transform: none; }
+            .feature-card:hover { transform: none; }
+            .testimonial-card:hover { transform: none; }
+            .step:hover .step-number { transform: none; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+
+    <!-- Preloader -->
+    <div class="preloader" id="preloader">
+        <div class="preloader-logo">ELITEDRIVE</div>
+        <div class="preloader-bar">
+            <div class="preloader-progress" id="preloader-progress"></div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <a href="#" class="logo">
+            <i class="fas fa-crown"></i>
+            EliteDrive
+        </a>
+        <ul class="nav-links">
+            <li><a href="#anasayfa">Ana Sayfa</a></li>
+            <li><a href="#filomuz">Filomuz</a></li>
+            <li><a href="#neden-biz">Neden Biz?</a></li>
+            <li><a href="#yorumlar">Yorumlar</a></li>
+            <li><a href="#iletisim">İletişim</a></li>
+        </ul>
+        <a href="https://wa.me/16395697826" target="_blank" class="nav-cta">
+            <i class="fab fa-whatsapp"></i> Hemen Kirala
+        </a>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+    <div class="mobile-menu" id="mobileMenu">
+        <ul>
+            <li><a href="#anasayfa" class="mobile-link"><i class="fas fa-home"></i> Ana Sayfa</a></li>
+            <li><a href="#filomuz" class="mobile-link"><i class="fas fa-car"></i> Filomuz</a></li>
+            <li><a href="#neden-biz" class="mobile-link"><i class="fas fa-star"></i> Neden Biz?</a></li>
+            <li><a href="#yorumlar" class="mobile-link"><i class="fas fa-comment"></i> Yorumlar</a></li>
+            <li><a href="#iletisim" class="mobile-link"><i class="fas fa-phone"></i> İletişim</a></li>
+            <li><a href="https://wa.me/16395697826" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></li>
+        </ul>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="anasayfa">
+        <div class="hero-bg"></div>
+        <div class="particles" id="particles"></div>
+        <div class="hero-content">
+            <div class="hero-badge">Premium Araç Kiralama</div>
+            <h1>
+                Konforu Hisset<br>
+                <span>Farkı Yaşa</span>
+            </h1>
+            <p class="hero-subtitle">
+                Güvenilir, konforlu ve ekonomik araçlarla yolculuğunuzu taçlandırın. 
+                EliteDrive kalitesiyle her yolculuk bir keyif.
+            </p>
+            <div class="hero-buttons">
+                <a href="#filomuz" class="btn-primary">
+                    <i class="fas fa-car"></i> Filoyu Keşfet
+                </a>
+                <a href="https://wa.me/16395697826" target="_blank" class="btn-secondary">
+                    <i class="fab fa-whatsapp"></i> WhatsApp'tan Ulaş
+                </a>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="stat-item">
+                <h3 class="counter" data-target="50">0</h3>
+                <p>Kaliteli Araç</p>
+            </div>
+            <div class="stat-item">
+                <h3 class="counter" data-target="5000">0</h3>
+                <p>Mutlu Müşteri</p>
+            </div>
+            <div class="stat-item">
+                <h3 class="counter" data-target="12">0</h3>
+                <p>Yıllık Tecrübe</p>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Aşağı Kaydır</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Fleet Section -->
+    <section class="fleet" id="filomuz">
+        <div class="section-header reveal">
+            <h2>Prestij Filomuz</h2>
+            <div class="gold-line"></div>
+            <p>Her bütçeye uygun, güvenilir ve konforlu araç seçenekleri</p>
+        </div>
+
+        <div class="fleet-grid">
+            <!-- Volkswagen Passat -->
+            <div class="car-card reveal">
+                <div class="car-image">
+                    <img src="https://kimi-web-img.moonshot.cn/img/image.made-in-china.com/4c040e4d7f4c60e45c562b11e0625cb0760d0f12.webp" alt="Volkswagen Passat">
+                    <span class="car-badge">En Çok Tercih Edilen</span>
+                </div>
+                <div class="car-info">
+                    <div class="car-brand">Volkswagen</div>
+                    <h3 class="car-name">Passat 2.0 TDI</h3>
+                    <div class="car-specs">
+                        <span class="car-spec"><i class="fas fa-user"></i> 5 Kişi</span>
+                        <span class="car-spec"><i class="fas fa-suitcase"></i> 3 Bavul</span>
+                        <span class="car-spec"><i class="fas fa-gas-pump"></i> Dizel</span>
+                        <span class="car-spec"><i class="fas fa-cog"></i> Otomatik</span>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">₺1.200 <span>/ gün</span></div>
+                        <button class="car-btn" onclick="window.open('https://wa.me/16395697826?text=Volkswagen%20Passat%20kiralamak%20istiyorum')">
+                            Kirala <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BMW 3 Series -->
+            <div class="car-card reveal">
+                <div class="car-image">
+                    <img src="https://kimi-web-img.moonshot.cn/img/media.edealer.ca/eb31a1bca002c0dc2ca08b03c6ec0b1730180942.webp" alt="BMW 3 Series">
+                    <span class="car-badge">Spor Sedan</span>
+                </div>
+                <div class="car-info">
+                    <div class="car-brand">BMW</div>
+                    <h3 class="car-name">3 Series 320i</h3>
+                    <div class="car-specs">
+                        <span class="car-spec"><i class="fas fa-user"></i> 5 Kişi</span>
+                        <span class="car-spec"><i class="fas fa-suitcase"></i> 2 Bavul</span>
+                        <span class="car-spec"><i class="fas fa-gas-pump"></i> Benzin</span>
+                        <span class="car-spec"><i class="fas fa-cog"></i> Otomatik</span>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">₺1.500 <span>/ gün</span></div>
+                        <button class="car-btn" onclick="window.open('https://wa.me/16395697826?text=BMW%203%20Series%20kiralamak%20istiyorum')">
+                            Kirala <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fiat Egea -->
+            <div class="car-card reveal">
+                <div class="car-image">
+                    <img src="https://kimi-web-img.moonshot.cn/img/www.fiat.com.tr/cb64a7e62626a486fdae86d958a3f2336a0c3631.png" alt="Fiat Egea">
+                    <span class="car-badge">Ekonomik</span>
+                </div>
+                <div class="car-info">
+                    <div class="car-brand">Fiat</div>
+                    <h3 class="car-name">Egea Sedan</h3>
+                    <div class="car-specs">
+                        <span class="car-spec"><i class="fas fa-user"></i> 5 Kişi</span>
+                        <span class="car-spec"><i class="fas fa-suitcase"></i> 2 Bavul</span>
+                        <span class="car-spec"><i class="fas fa-gas-pump"></i> Benzin</span>
+                        <span class="car-spec"><i class="fas fa-cog"></i> Manuel</span>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">₺650 <span>/ gün</span></div>
+                        <button class="car-btn" onclick="window.open('https://wa.me/16395697826?text=Fiat%20Egea%20kiralamak%20istiyorum')">
+                            Kirala <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Volkswagen Golf -->
+            <div class="car-card reveal">
+                <div class="car-image">
+                    <img src="https://kimi-web-img.moonshot.cn/img/car-images.bauersecure.com/c38bb271f4491959e110912e7ffbe844ea251444.jpg" alt="Volkswagen Golf">
+                    <span class="car-badge">Hatchback</span>
+                </div>
+                <div class="car-info">
+                    <div class="car-brand">Volkswagen</div>
+                    <h3 class="car-name">Golf 1.5 TSI</h3>
+                    <div class="car-specs">
+                        <span class="car-spec"><i class="fas fa-user"></i> 5 Kişi</span>
+                        <span class="car-spec"><i class="fas fa-suitcase"></i> 2 Bavul</span>
+                        <span class="car-spec"><i class="fas fa-gas-pump"></i> Benzin</span>
+                        <span class="car-spec"><i class="fas fa-cog"></i> Otomatik</span>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">₺900 <span>/ gün</span></div>
+                        <button class="car-btn" onclick="window.open('https://wa.me/16395697826?text=Volkswagen%20Golf%20kiralamak%20istiyorum')">
+                            Kirala <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BMW 5 Series -->
+            <div class="car-card reveal">
+                <div class="car-image">
+                    <img src="https://kimi-web-img.moonshot.cn/img/cdn.bmwblog.com/06292c4e33bf1fc3a657dad67e511e0d45d9cf37.jpg" alt="BMW 5 Series">
+                    <span class="car-badge">Executive</span>
+                </div>
+                <div class="car-info">
+                    <div class="car-brand">BMW</div>
+                    <h3 class="car-name">5 Series 520d</h3>
+                    <div class="car-specs">
+                        <span class="car-spec"><i class="fas fa-user"></i> 5 Kişi</span>
+                        <span class="car-spec"><i class="fas fa-suitcase"></i> 3 Bavul</span>
+                        <span class="car-spec"><i class="fas fa-gas-pump"></i> Dizel</span>
+                        <span class="car-spec"><i class="fas fa-cog"></i> Otomatik</span>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">₺2.000 <span>/ gün</span></div>
+                        <button class="car-btn" onclick="window.open('https://wa.me/16395697826?text=BMW%205%20Series%20kiralamak%20istiyorum')">
+                            Kirala <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audi A4 -->
+            <div class="car-card reveal">
+                <div class="car-image">
+                    <img src="https://kimi-web-img.moonshot.cn/img/automanager.blob.core.windows.net/3d61ba29efa41b271dd86a87b14496d46545c5e8.jpg" alt="Audi A4">
+                    <span class="car-badge">Premium</span>
+                </div>
+                <div class="car-info">
+                    <div class="car-brand">Audi</div>
+                    <h3 class="car-name">A4 40 TFSI</h3>
+                    <div class="car-specs">
+                        <span class="car-spec"><i class="fas fa-user"></i> 5 Kişi</span>
+                        <span class="car-spec"><i class="fas fa-suitcase"></i> 2 Bavul</span>
+                        <span class="car-spec"><i class="fas fa-gas-pump"></i> Benzin</span>
+                        <span class="car-spec"><i class="fas fa-cog"></i> Otomatik</span>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">₺1.800 <span>/ gün</span></div>
+                        <button class="car-btn" onclick="window.open('https://wa.me/16395697826?text=Audi%20A4%20kiralamak%20istiyorum')">
+                            Kirala <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mercedes A-Class -->
+            <div class="car-card reveal">
+                <div class="car-image">
+                    <img src="https://kimi-web-img.moonshot.cn/img/luxurycars.co.ke/372516e34dec3bc0ed68c4d1f033c43ba12c096f.jpg" alt="Mercedes A-Class">
+                    <span class="car-badge">Kompakt</span>
+                </div>
+                <div class="car-info">
+                    <div class="car-brand">Mercedes-Benz</div>
+                    <h3 class="car-name">A-Class A200</h3>
+                    <div class="car-specs">
+                        <span class="car-spec"><i class="fas fa-user"></i> 5 Kişi</span>
+                        <span class="car-spec"><i class="fas fa-suitcase"></i> 2 Bavul</span>
+                        <span class="car-spec"><i class="fas fa-gas-pump"></i> Benzin</span>
+                        <span class="car-spec"><i class="fas fa-cog"></i> Otomatik</span>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">₺1.100 <span>/ gün</span></div>
+                        <button class="car-btn" onclick="window.open('https://wa.me/16395697826?text=Mercedes%20A-Class%20kiralamak%20istiyorum')">
+                            Kirala <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Renault Megane -->
+            <div class="car-card reveal">
+                <div class="car-image">
+                    <img src="https://kimi-web-img.moonshot.cn/img/s3.eu-central-1.amazonaws.com/3c75297fe4205cd15e36592275670e9e1bf8d4ed.webp" alt="Renault Megane">
+                    <span class="car-badge">Aile</span>
+                </div>
+                <div class="car-info">
+                    <div class="car-brand">Renault</div>
+                    <h3 class="car-name">Megane Sedan</h3>
+                    <div class="car-specs">
+                        <span class="car-spec"><i class="fas fa-user"></i> 5 Kişi</span>
+                        <span class="car-spec"><i class="fas fa-suitcase"></i> 2 Bavul</span>
+                        <span class="car-spec"><i class="fas fa-gas-pump"></i> Benzin</span>
+                        <span class="car-spec"><i class="fas fa-cog"></i> Otomatik</span>
+                    </div>
+                    <div class="car-footer">
+                        <div class="car-price">₺750 <span>/ gün</span></div>
+                        <button class="car-btn" onclick="window.open('https://wa.me/16395697826?text=Renault%20Megane%20kiralamak%20istiyorum')">
+                            Kirala <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="neden-biz">
+        <div class="section-header reveal">
+            <h2>Neden EliteDrive?</h2>
+            <div class="gold-line"></div>
+            <p>Mükemmelliği standart kabul ediyoruz. Her detayda farkı hissedin.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Tam Kapsamlı Sigorta</h3>
+                <p>Tüm araçlarımız kasko, trafik ve ferdi kaza sigortası ile tam koruma altında. Siz sadece yolculuğun tadını çıkarın.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>7/24 Destek</h3>
+                <p>Gece gündüz fark etmeksizin uzman ekibimiz her an yanınızda. Acil durumlarda anında müdahale garantisi.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <h3>Kapıdan Teslimat</h3>
+                <p>İster havalimanı ister otel, dilediğiniz adreste aracınızı teslim alın. Şehir içi teslimat ücretsiz.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>Detaylı Temizlik</h3>
+                <p>Her kiralama öncesi profesyonel detaylı temizlik ve dezenfeksiyon. Hijyen standartlarımız en üst seviyede.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <h3>En Yeni Modeller</h3>
+                <p>Filo ortalama yaşı 2 yılın altında. Her sezon en güncel modelleri ve özel donanımları sizlerle buluşturuyoruz.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="feature-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <h3>Şeffaf Fiyatlandırma</h3>
+                <p>Gizli maliyet yok, sürpriz ekstra ücret yok. Gördüğünüz fiyat, ödeyeceğiniz son fiyattır.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process">
+        <div class="section-header reveal">
+            <h2>Kiralama Süreci</h2>
+            <div class="gold-line"></div>
+            <p>4 basit adımda hayalinizdeki araca kavuşun</p>
+        </div>
+
+        <div class="process-steps">
+            <div class="step reveal">
+                <div class="step-number">01</div>
+                <h3>Araç Seçimi</h3>
+                <p>Prestij filomuzdan size en uygun modeli seçin. Detaylı fotoğraf ve teknik özelliklerle karar verin.</p>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">02</div>
+                <h3>Rezervasyon</h3>
+                <p>WhatsApp veya online form üzerinden hızlı rezervasyon yapın. Anında onay alın.</p>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">03</div>
+                <h3>Doğrulama</h3>
+                <p>Kimlik ve ehliyet bilgilerinizi güvenli sistemimizle doğrulayın. 5 dakika süren kolay süreç.</p>
+            </div>
+            <div class="step reveal">
+                <div class="step-number">04</div>
+                <h3>Teslimat</h3>
+                <p>Seçtiğiniz adreste, söz verdiğimiz saatte pırıl pırıl aracınızı teslim alın.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials" id="yorumlar">
+        <div class="section-header reveal">
+            <h2>Müşteri Deneyimleri</h2>
+            <div class="gold-line"></div>
+            <p>Binlerce memnun müşterimizin gerçek hikayeleri</p>
+        </div>
+
+        <div class="testimonials-container">
+            <div class="testimonials-slider">
+                <!-- Review 1 -->
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "Ailemle tatile çıkmak için Passat kiraladık. Araç muazzam temizdi ve teslimat tam zamanında yapıldı. Fiyat performans açısından harika bir deneyimdi. EliteDrive artık tek tercihimiz."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AK</div>
+                        <div class="author-info">
+                            <h4>Ahmet K.</h4>
+                            <p>İstanbul, Türkiye</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-car">
+                        <i class="fas fa-car"></i> Volkswagen Passat 2.0 TDI
+                    </div>
+                </div>
+
+                <!-- Review 2 -->
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "İş seyahatimde BMW 3 Series kiraladım. Araç beklediğimden daha konforluydu. Havalimanında karşılanma hizmeti gerçekten profesyoneldi. Kesinlikle tavsiye ederim."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SY</div>
+                        <div class="author-info">
+                            <h4>Sarah Y.</h4>
+                            <p>New York, ABD</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-car">
+                        <i class="fas fa-car"></i> BMW 3 Series 320i
+                    </div>
+                </div>
+
+                <!-- Review 3 -->
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "Egea kiraladım ve bu fiyata bu kadar konfor beklemiyordum. Yakıt ekonomisi harika, şehir içi kullanımda ideal. Öğrenci bütçesine uygun, kesinlikle tekrar kiralayacağım."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">MB</div>
+                        <div class="author-info">
+                            <h4>Mehmet B.</h4>
+                            <p>Antalya, Türkiye</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-car">
+                        <i class="fas fa-car"></i> Fiat Egea Sedan
+                    </div>
+                </div>
+
+                <!-- Review 4 -->
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "VIP müşterilerimi ağırlamak için BMW 5 Series kiraladım. Araç içindeki her detay nefes kesici. EliteDrive ekibi gerçekten premium hizmetin ne demek olduğunu biliyor."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JL</div>
+                        <div class="author-info">
+                            <h4>James L.</h4>
+                            <p>London, UK</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-car">
+                        <i class="fas fa-car"></i> BMW 5 Series 520d
+                    </div>
+                </div>
+
+                <!-- Review 5 -->
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "İlk defa araç kiraladım ve biraz tereddütlüydüm ama EliteDrive ekibi tüm süreçte o kadar yardımcı oldular ki. Golf harikaydı, kesinlikle tekrar kiralayacağım."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">EO</div>
+                        <div class="author-info">
+                            <h4>Emily O.</h4>
+                            <p>Toronto, Kanada</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-car">
+                        <i class="fas fa-car"></i> Volkswagen Golf 1.5 TSI
+                    </div>
+                </div>
+
+                <!-- Review 6 -->
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "Audi A4 ile özel bir etkinliğe katıldım. Valetler bile araca hayran kaldı. EliteDrive'ın sunduğu hizmet kalitesi gerçekten farklı. Tam bir premium deneyim."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">KA</div>
+                        <div class="author-info">
+                            <h4>Kerem A.</h4>
+                            <p>Dubai, BAE</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-car">
+                        <i class="fas fa-car"></i> Audi A4 40 TFSI
+                    </div>
+                </div>
+
+                <!-- Review 7 -->
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "Mercedes A-Class kiraladım ve bu hayatımın en güzel hafta sonuydu. Araç teslim edildiğinde kilometre sayacı bile düşüktü, yani tamamen bakımlı bir araç. Bu detaycılık takdire şayan."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">DM</div>
+                        <div class="author-info">
+                            <h4>David M.</h4>
+                            <p>Miami, ABD</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-car">
+                        <i class="fas fa-car"></i> Mercedes A-Class A200
+                    </div>
+                </div>
+
+                <!-- Review 8 -->
+                <div class="testimonial-card reveal">
+                    <div class="testimonial-stars">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "Eşim için sürpriz doğum günü planladım ve Renault Megane kiraladım. Teslimat ekibi çiçeklerle birlikte aracı getirdi. Bu düşüncelik için EliteDrive'a minnettarım."
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">CT</div>
+                        <div class="author-info">
+                            <h4>Can T.</h4>
+                            <p>Ankara, Türkiye</p>
+                        </div>
+                    </div>
+                    <div class="testimonial-car">
+                        <i class="fas fa-car"></i> Renault Megane Sedan
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="iletisim">
+        <h2 class="reveal">Yolculuğunuz Başlasın</h2>
+        <p class="reveal">EliteDrive ayrıcalığıyla tanışın. Size özel fırsatlar ve kampanyalar için hemen iletişime geçin.</p>
+        <div class="hero-buttons reveal" style="justify-content: center;">
+            <a href="https://wa.me/16395697826" target="_blank" class="btn-primary">
+                <i class="fab fa-whatsapp"></i> +1 (639) 569-7826
+            </a>
+            <a href="mailto:info@elitedrive.com" class="btn-secondary">
+                <i class="fas fa-envelope"></i> E-Posta Gönder
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="logo">
+                    <i class="fas fa-crown"></i>
+                    EliteDrive
+                </a>
+                <p>2012'den beri lüks ve prestij araç kiralama sektöründe hizmet veriyoruz. Mükemmellik standartımız, memnuniyet garantimizdir.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-column">
+                <h4>Hızlı Bağlantılar</h4>
+                <ul>
+                    <li><a href="#anasayfa"><i class="fas fa-chevron-right"></i> Ana Sayfa</a></li>
+                    <li><a href="#filomuz"><i class="fas fa-chevron-right"></i> Filomuz</a></li>
+                    <li><a href="#neden-biz"><i class="fas fa-chevron-right"></i> Neden Biz?</a></li>
+                    <li><a href="#yorumlar"><i class="fas fa-chevron-right"></i> Yorumlar</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>Araç Kategorileri</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Ekonomik</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Sedan</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Hatchback</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right"></i> Executive</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h4>İletişim</h4>
+                <ul>
+                    <li><a href="https://wa.me/16395697826"><i class="fab fa-whatsapp"></i> +1 (639) 569-7826</a></li>
+                    <li><a href="mailto:info@elitedrive.com"><i class="fas fa-envelope"></i> info@elitedrive.com</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> Prestij Plaza, No:42</a></li>
+                    <li><a href="#"><i class="fas fa-clock"></i> 7/24 Hizmet</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; EliteDrive Premium Car Rental. Tüm hakları saklıdır.</p>
+            <p><a href="#">Gizlilik Politikası</a> | <a href="#">Kullanım Koşulları</a> | <a href="#">Çerez Ayarları</a></p>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Float Button -->
+    <a href="https://wa.me/16395697826" target="_blank" class="whatsapp-float">
+        <i class="fab fa-whatsapp"></i>
+        <span class="whatsapp-tooltip">Hemen Yazın!</span>
+    </a>
+
+    <script>
+        // Preloader
+        window.addEventListener('load', () => {
+            const progress = document.getElementById('preloader-progress');
+            const preloader = document.getElementById('preloader');
+            let width = 0;
+
+            const interval = setInterval(() => {
+                width += Math.random() * 30;
+                if (width >= 100) {
+                    width = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        gsap.to(preloader, {
+                            opacity: 0,
+                            duration: 0.8,
+                            onComplete: () => {
+                                preloader.style.display = 'none';
+                                initAnimations();
+                            }
+                        });
+                    }, 500);
+                }
+                progress.style.width = width + '%';
+            }, 200);
+        });
+
+        // Particles
+        function createParticles() {
+            const container = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+        createParticles();
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile Menu
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileOverlay = document.getElementById('mobileOverlay');
+        const mobileLinks = document.querySelectorAll('.mobile-link');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            mobileOverlay.classList.toggle('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            if (mobileMenu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        mobileOverlay.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+            mobileOverlay.classList.remove('active');
+            const icon = mobileMenuBtn.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+        });
+
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                mobileOverlay.classList.remove('active');
+                const icon = mobileMenuBtn.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            });
+        });
+
+        // GSAP Animations
+        function initAnimations() {
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Hero Animations
+            gsap.to('.hero-badge', { opacity: 1, y: 0, duration: 1, delay: 0.2 });
+            gsap.to('.hero h1', { opacity: 1, y: 0, duration: 1.2, delay: 0.4, ease: 'power3.out' });
+            gsap.to('.hero-subtitle', { opacity: 1, y: 0, duration: 1, delay: 0.6 });
+            gsap.to('.hero-buttons', { opacity: 1, y: 0, duration: 1, delay: 0.8 });
+            gsap.to('.hero-stats', { opacity: 1, duration: 1, delay: 1.2 });
+
+            // Counter Animation
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                const target = parseInt(counter.getAttribute('data-target'));
+                gsap.to(counter, {
+                    innerHTML: target,
+                    duration: 2,
+                    delay: 1.5,
+                    snap: { innerHTML: 1 },
+                    ease: 'power2.out'
+                });
+            });
+
+            // Scroll Reveal
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach((element, index) => {
+                gsap.fromTo(element, 
+                    { opacity: 0, y: 50 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        duration: 0.8,
+                        delay: index * 0.1,
+                        scrollTrigger: {
+                            trigger: element,
+                            start: 'top 85%',
+                            toggleActions: 'play none none none'
+                        }
+                    }
+                );
+            });
+
+            // Car Cards Stagger
+            gsap.from('.car-card', {
+                opacity: 0,
+                y: 60,
+                duration: 0.8,
+                stagger: 0.15,
+                scrollTrigger: {
+                    trigger: '.fleet-grid',
+                    start: 'top 80%'
+                }
+            });
+
+            // Feature Cards Stagger
+            gsap.from('.feature-card', {
+                opacity: 0,
+                y: 50,
+                duration: 0.6,
+                stagger: 0.1,
+                scrollTrigger: {
+                    trigger: '.features-grid',
+                    start: 'top 80%'
+                }
+            });
+
+            // Steps Animation
+            gsap.from('.step', {
+                opacity: 0,
+                x: -30,
+                duration: 0.8,
+                stagger: 0.2,
+                scrollTrigger: {
+                    trigger: '.process-steps',
+                    start: 'top 80%'
+                }
+            });
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Testimonials Auto Scroll
+        const slider = document.querySelector('.testimonials-slider');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        slider.addEventListener('mousedown', (e) => {
+            isDown = true;
+            slider.style.cursor = 'grabbing';
+            startX = e.pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        });
+
+        slider.addEventListener('mouseleave', () => {
+            isDown = false;
+            slider.style.cursor = 'grab';
+        });
+
+        slider.addEventListener('mouseup', () => {
+            isDown = false;
+            slider.style.cursor = 'grab';
+        });
+
+        slider.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2;
+            slider.scrollLeft = scrollLeft - walk;
+        });
+
+        // Touch support for testimonials slider
+        slider.addEventListener('touchstart', (e) => {
+            isDown = true;
+            startX = e.touches[0].pageX - slider.offsetLeft;
+            scrollLeft = slider.scrollLeft;
+        }, { passive: true });
+
+        slider.addEventListener('touchend', () => {
+            isDown = false;
+        }, { passive: true });
+
+        slider.addEventListener('touchmove', (e) => {
+            if (!isDown) return;
+            const x = e.touches[0].pageX - slider.offsetLeft;
+            const walk = (x - startX) * 2;
+            slider.scrollLeft = scrollLeft - walk;
+        }, { passive: true });
+
+        // Parallax Effect on Hero
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const heroBg = document.querySelector('.hero-bg');
+            if (heroBg) {
+                heroBg.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+    </script>
+</body>
+</html>
